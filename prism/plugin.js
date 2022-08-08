@@ -3,7 +3,7 @@
  TinyMCE6 prismプラグイン / prism plugin for TinyMCE6
 
  ライセンス / License：LGPL
- ver.1.0.0 (2022/08/05)
+ ver.1.0.1 (2022/08/08)
  Homepage : https://holydragoon.jp/
  Copyright(C) 2022 MINAKATA Kaori.
 
@@ -16,8 +16,8 @@
 	tinymce.PluginManager.add('prism', function (editor) {
 		//ダイアログの中身を設定 / Set the contents of the dialog
 		function _getDialogConfig() {
-			var dom = editor.dom, selection = editor.selection, data = {}, Elmt, ln, fl, hl;
-			var defaultLanguage = 'markup', selectedCode, brTag = '';
+			const dom = editor.dom, selection = editor.selection, defaultLanguage = 'markup';
+			let data = {}, brTag = '', Elmt, ln = '', fl, hl;
 
 			//言語設定の初期化 / Initialize language settings
 			editor.options.register('prism_languages', {
@@ -32,8 +32,8 @@
 
 			//言語設定 / Language settings
 			//tinymce.initでprism_languages: [{text: '○○', value: '○○'},～];で指定した言語設定が代入されます / The language setting specified by prism_languages: [{text: 'xx', value: 'xx'}, ~]; will be assigned in tinymce.init.
-			var languageItems = editor.options.get('prism_languages');
-			selectedCode = selection.getContent({ format: 'text' });
+			const languageItems = editor.options.get('prism_languages');
+			const selectedCode  = selection.getContent({ format: 'text' });
 
 			data.code = selectedCode;
 			if (data.code == '') {
@@ -103,12 +103,13 @@
 
 						return;
 					} else {
-						var code = api.getData().code;
-						code = code.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/　{4}/g, "\t");
-						var language = api.getData().language ? api.getData().language : defaultLanguage;
-						var firstline = api.getData().firstline ? api.getData().firstline : '';
-						var linenumber = api.getData().linenumber ? api.getData().linenumber : false;
-						var highlight = api.getData().highlight ? api.getData().highlight : '';
+						let prism_code = api.getData().code;
+						prism_code     = prism_code.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/　{4}/g, "\t");
+
+						const language   = api.getData().language ? api.getData().language : defaultLanguage;
+						const firstline  = api.getData().firstline ? api.getData().firstline : '';
+						const linenumber = api.getData().linenumber ? api.getData().linenumber : false;
+						const highlight  = api.getData().highlight ? api.getData().highlight : '';
 
 						//<code>の中身を設定 / Set contents of <code>
 						Elmt = dom.create('code', {
@@ -130,7 +131,7 @@
 							hl = ' data-line="' + highlight + '"';
 						}
 
-						if (ln === undefined) {
+						if (ln == '') {
 							tinymce.activeEditor.execCommand('mceInsertContent', false, `<pre>` + dom.getOuterHTML(Elmt) + `</pre>` + brTag);
 						} else {
 							tinymce.activeEditor.execCommand('mceInsertContent', false, `<pre` + ln + fl + hl + `>` + dom.getOuterHTML(Elmt) + `</pre>` + brTag);
@@ -154,11 +155,11 @@
 		}
 
 		function _onAction() {
-			var selection = editor.selection, selectionNode = selection.getNode();
+			const selection = editor.selection, selectionNode = selection.getNode();
 
 			if (selectionNode.nodeName.toLowerCase() === 'code') {
-				var text = $(selectionNode).unwrap().text();
-				text = text.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\n{2}/g, '<p>').replace(/\n/g, '<br>').replace(/ /g, "&nbsp;").replace(/\t/g, "　　　　");
+				let text = $(selectionNode).unwrap().text();
+				text     = text.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace(/\n{2}/g, '<p>').replace(/\n/g, '<br>').replace(/ /g, "&nbsp;").replace(/\t/g, "　　　　");
 				selection.setContent(text);
 				selectionNode.remove();
 			} else {
@@ -172,7 +173,7 @@
 			tooltip: 'Insert code with Prism',
 			onAction: _onAction,
 			onSetup: (buttonApi) => {
-				var editorEventCallback = (eventApi) => {
+				const editorEventCallback = (eventApi) => {
 					buttonApi.setActive(eventApi.element.nodeName.toLowerCase() === 'code');
 				};
 				editor.on('NodeChange', editorEventCallback);
